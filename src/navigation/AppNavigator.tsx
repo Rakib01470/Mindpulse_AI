@@ -14,6 +14,7 @@ import { VoiceCaptureScreen } from '../screens/VoiceCaptureScreen';
 import { TaskDetailScreen } from '../screens/TaskDetailScreen';
 import { ProjectDetailScreen } from '../screens/ProjectDetailScreen';
 import { TimerWidget } from '../components/projects/TimerWidget';
+import { NoteEditorScreen } from '../screens/NoteEditorScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -65,6 +66,7 @@ export function AppNavigator() {
       />
       <Stack.Screen name="TaskDetail" component={TaskDetailScreen} options={{ title: 'Task' }} />
       <Stack.Screen name="ProjectDetail" component={ProjectDetailScreen} options={{ title: 'Project' }} />
+      <Stack.Screen name="NoteEditor" component={NoteEditorScreen} options={{ title: 'Note' }} />
     </Stack.Navigator>
   );
 }

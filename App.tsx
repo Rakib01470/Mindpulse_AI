@@ -8,6 +8,7 @@ import { DatabaseProvider } from './src/context/DatabaseContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { TasksProvider } from './src/context/TasksContext';
 import { ProjectsProvider } from './src/context/ProjectsContext';
+import { NotesProvider } from './src/context/NotesContext';
 import { StopTimerModal } from './src/components/projects/StopTimerModal';
 
 export default function App() {
@@ -17,11 +18,13 @@ export default function App() {
         <DatabaseProvider>
           <TasksProvider>
             <ProjectsProvider>
-              <NavigationContainer theme={navTheme}>
-                <AppNavigator />
-                <StopTimerModal />
-                <StatusBar style="light" />
-              </NavigationContainer>
+              <NotesProvider>
+                <NavigationContainer theme={navTheme}>
+                  <AppNavigator />
+                  <StopTimerModal />
+                  <StatusBar style="light" />
+                </NavigationContainer>
+              </NotesProvider>
             </ProjectsProvider>
           </TasksProvider>
         </DatabaseProvider>

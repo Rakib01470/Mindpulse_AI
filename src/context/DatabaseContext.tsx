@@ -8,8 +8,12 @@ import { ThemeTokens } from '../utils/theme';
 
 export const DB_NAME = 'mindpulse.db';
 
-/** Adapts expo-sqlite's database object to the DAO interface. */
+/**
+ * Adapts expo-sqlite's database object to the DAO interface. Transactions are queued so two
+ * never overlap (expo-sqlite rejects a transaction started while another is open).
+ */
 export function wrapExpoDb(db: SQLite.SQLiteDatabase): DbLike {
+  let queue: Promise<unknown> = Promise.resolve();
   return {
     execAsync: (sql) => db.execAsync(sql),
     runAsync: async (sql, params: SqlValue[] = []) => {
@@ -18,7 +22,11 @@ export function wrapExpoDb(db: SQLite.SQLiteDatabase): DbLike {
     },
     getAllAsync: <T,>(sql: string, params: SqlValue[] = []) => db.getAllAsync<T>(sql, params),
     getFirstAsync: <T,>(sql: string, params: SqlValue[] = []) => db.getFirstAsync<T>(sql, params),
-    withTransactionAsync: (task) => db.withTransactionAsync(task),
+    withTransactionAsync: (task) => {
+      const run = queue.then(() => db.withTransactionAsync(task));
+      queue = run.catch(() => undefined);
+      return run;
+    },
   };
 }
 

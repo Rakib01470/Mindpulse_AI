@@ -4,6 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { ApiKeySection } from '../components/settings/ApiKeySection';
 import { CategoriesSection } from '../components/settings/CategoriesSection';
+import { BackupSection } from '../components/settings/BackupSection';
+import { Text } from 'react-native-paper';
+import Constants from 'expo-constants';
 import { ThemeTokens } from '../utils/theme';
 
 export function SettingsScreen() {
@@ -13,6 +16,10 @@ export function SettingsScreen() {
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <ApiKeySection />
         <CategoriesSection />
+        <BackupSection />
+        <Text variant="labelSmall" style={styles.version}>
+          MindPulse AI v{Constants.expoConfig?.version ?? '1.0.0'} · local-first, no account
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -20,5 +27,6 @@ export function SettingsScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  version: { color: ThemeTokens.colors.textMuted, textAlign: 'center' },
   content: { padding: ThemeTokens.spacing.md, gap: ThemeTokens.spacing.md, paddingBottom: 120 },
 });

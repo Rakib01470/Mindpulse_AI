@@ -1,3 +1,5 @@
+// Full WHATWG URL for the Anthropic SDK (React Native's built-in URL is partial).
+import 'react-native-url-polyfill/auto';
 import { registerRootComponent } from 'expo';
 
 import App from './App';

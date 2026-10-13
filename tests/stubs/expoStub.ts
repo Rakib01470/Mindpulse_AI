@@ -14,3 +14,4 @@ export const digest = notInTests;
 export const CryptoDigestAlgorithm = { SHA256: 'SHA-256' };
 export const EncodingType = { UTF8: 'utf8' };
 export default {};
+export const isAvailableAsync = notInTests;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, Platform } from 'react-native';
-import { Button, HelperText, SegmentedButtons, Text, TextInput } from 'react-native-paper';
+import { Button, HelperText, IconButton, SegmentedButtons, Text, TextInput } from 'react-native-paper';
 import Slider from '@react-native-community/slider';
 import DateTimePicker, { DateTimePickerAndroid, type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { CalendarDays, Clock, X } from 'lucide-react-native';
@@ -102,17 +102,13 @@ export function TaskForm({ value, onChange, categories, showProgress, titleError
           {value.due_date ? formatDisplayDate(value.due_date) : 'Set date'}
         </Button>
         {value.due_date ? (
-          <Button compact onPress={() => set('due_date', null)} style={styles.clearBtn} accessibilityLabel="Clear date">
-            <X color={c.textMuted} size={18} />
-          </Button>
+          <IconButton icon={({ size }) => <X color={c.textMuted} size={size} />} onPress={() => set('due_date', null)} style={styles.clearBtn} accessibilityLabel="Clear date" />
         ) : null}
         <Button mode="outlined" icon={({ color }) => <Clock color={color} size={18} />} onPress={() => openPicker('time')} style={styles.dueBtn}>
           {value.due_time ? formatTime12(value.due_time) : 'Set time'}
         </Button>
         {value.due_time ? (
-          <Button compact onPress={() => set('due_time', null)} style={styles.clearBtn} accessibilityLabel="Clear time">
-            <X color={c.textMuted} size={18} />
-          </Button>
+          <IconButton icon={({ size }) => <X color={c.textMuted} size={size} />} onPress={() => set('due_time', null)} style={styles.clearBtn} accessibilityLabel="Clear time" />
         ) : null}
       </View>
       {iosPicker ? (
@@ -175,7 +171,7 @@ const styles = StyleSheet.create({
   segment: { minHeight: 48, justifyContent: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
   dueBtn: { minHeight: 48, justifyContent: 'center' },
-  clearBtn: { minWidth: 48, minHeight: 48, justifyContent: 'center' },
+  clearBtn: { width: 48, height: 48, margin: 0 },
   spaced: { marginTop: 10 },
   slider: { height: 48 },
 });

@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { ApiKeySection } from '../components/settings/ApiKeySection';
+import { CategoriesSection } from '../components/settings/CategoriesSection';
 import { ThemeTokens } from '../utils/theme';
 
 export function SettingsScreen() {
@@ -11,6 +12,7 @@ export function SettingsScreen() {
       <ScreenHeader title="Settings" />
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <ApiKeySection />
+        <CategoriesSection />
       </ScrollView>
     </SafeAreaView>
   );

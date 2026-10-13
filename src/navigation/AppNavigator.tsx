@@ -10,6 +10,7 @@ import { ProjectsScreen } from '../screens/ProjectsScreen';
 import { NotesScreen } from '../screens/NotesScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { VoiceCaptureScreen } from '../screens/VoiceCaptureScreen';
+import { TaskDetailScreen } from '../screens/TaskDetailScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -52,6 +53,7 @@ export function AppNavigator() {
         component={VoiceCaptureScreen}
         options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
       />
+      <Stack.Screen name="TaskDetail" component={TaskDetailScreen} options={{ title: 'Task' }} />
     </Stack.Navigator>
   );
 }

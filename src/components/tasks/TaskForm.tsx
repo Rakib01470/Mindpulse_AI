@@ -61,6 +61,7 @@ export function TaskForm({ value, onChange, categories, showProgress, titleError
       <TextInput
         mode="outlined"
         label="Title"
+        accessibilityLabel="Task title"
         value={value.title}
         onChangeText={(t) => set('title', t)}
         maxLength={LIMITS.taskTitle}
@@ -128,6 +129,7 @@ export function TaskForm({ value, onChange, categories, showProgress, titleError
       <TextInput
         mode="outlined"
         label="Summary"
+        accessibilityLabel="Task summary"
         value={value.summary ?? ''}
         onChangeText={(t) => set('summary', t)}
         multiline
@@ -136,6 +138,7 @@ export function TaskForm({ value, onChange, categories, showProgress, titleError
       <TextInput
         mode="outlined"
         label="Details"
+        accessibilityLabel="Task details"
         value={value.details ?? ''}
         onChangeText={(t) => set('details', t)}
         multiline

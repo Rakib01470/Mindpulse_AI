@@ -4,11 +4,17 @@ import { Button, HelperText, Text, TextInput, Surface } from 'react-native-paper
 import { CheckCircle2, XCircle, KeyRound } from 'lucide-react-native';
 import { useDatabase } from '../../context/DatabaseContext';
 import { loadApiKey, saveApiKey, clearApiKey, maskApiKey } from '../../services/apiKeyStore';
-import { testApiKey } from '../../services/aiService';
+import { AiError, testApiKey } from '../../services/aiService';
 import { AI_MODEL, MESSAGES } from '../../utils/constants';
 import { ThemeTokens } from '../../utils/theme';
 
-type TestState = { kind: 'idle' } | { kind: 'testing' } | { kind: 'valid' } | { kind: 'invalid' } | { kind: 'offline' };
+type TestState =
+  | { kind: 'idle' }
+  | { kind: 'testing' }
+  | { kind: 'valid' }
+  | { kind: 'invalid' }
+  | { kind: 'offline' }
+  | { kind: 'error'; message: string };
 
 export function ApiKeySection() {
   const { db } = useDatabase();
@@ -52,8 +58,9 @@ export function ApiKeySection() {
     setTest({ kind: 'testing' });
     try {
       setTest({ kind: (await testApiKey(key)) ? 'valid' : 'invalid' });
-    } catch {
-      setTest({ kind: 'offline' });
+    } catch (e) {
+      if (e instanceof AiError && e.kind === 'network') setTest({ kind: 'offline' });
+      else setTest({ kind: 'error', message: e instanceof Error ? e.message : String(e) });
     }
   };
 
@@ -77,6 +84,7 @@ export function ApiKeySection() {
       <TextInput
         mode="outlined"
         label={saved ? 'Replace key' : 'sk-ant-...'}
+        accessibilityLabel="Anthropic API key"
         value={input}
         onChangeText={(t) => {
           setInput(t);
@@ -110,6 +118,7 @@ export function ApiKeySection() {
         </View>
       ) : null}
       {test.kind === 'offline' ? <HelperText type="error">Network unavailable — could not reach Anthropic.</HelperText> : null}
+      {test.kind === 'error' ? <HelperText type="error">Could not verify the key: {test.message}</HelperText> : null}
       {saved ? (
         <Button mode="text" onPress={onClear} textColor={ThemeTokens.colors.priorityHigh} style={styles.clear}>
           Remove saved key

@@ -52,6 +52,7 @@ export function ManualTimeModal({ project, onDismiss }: { project: Project | nul
               setError(null);
             }}
             keyboardType="decimal-pad"
+            accessibilityLabel="Hours to log"
             autoFocus
             error={!!error}
           />

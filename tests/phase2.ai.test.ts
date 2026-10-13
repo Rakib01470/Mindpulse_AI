@@ -155,7 +155,13 @@ describe('Phase 2 — error classification (Section 10)', () => {
     });
     await expect(parseTaskFromTranscript('x', { apiKey: 'k', categories: [], client })).rejects.toMatchObject({ kind: 'network' });
   });
-  it('testApiKey: true on success, false on 401, throws on network', async () => {
+  it('testApiKey: true on success, false on 401/403, throws on network or other errors', async () => {
+    await expect(
+      testApiKey('k', fake(() => { throw new Anthropic.NotFoundError(404, {}, 'model: not_found', headers); })),
+    ).rejects.toMatchObject({ kind: 'other' });
+    await expect(
+      testApiKey('k', fake(() => { throw new Anthropic.PermissionDeniedError(403, {}, 'forbidden', headers); })),
+    ).resolves.toBe(false);
     await expect(testApiKey('k', fake('OK'))).resolves.toBe(true);
     await expect(
       testApiKey('k', fake(() => { throw new Anthropic.AuthenticationError(401, {}, 'bad', headers); })),

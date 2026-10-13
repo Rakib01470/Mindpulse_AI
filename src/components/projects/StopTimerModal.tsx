@@ -38,7 +38,7 @@ export function StopTimerModal() {
           {elapsed < 1 ? (
             <Text style={{ color: ThemeTokens.colors.priorityMedium }}>Session is under 1 second and will not be logged.</Text>
           ) : (
-            <TextInput mode="outlined" label="Session notes (optional)" value={notes} onChangeText={setNotes} multiline />
+            <TextInput mode="outlined" label="Session notes (optional)" accessibilityLabel="Session notes" value={notes} onChangeText={setNotes} multiline />
           )}
         </Dialog.Content>
         <Dialog.Actions>

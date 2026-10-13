@@ -170,15 +170,19 @@ export async function fixGrammar(text: string, opts: { apiKey: string | null; cl
   }
 }
 
-/** Lightweight validity check (F6). Resolves true/false; rejects only on network failure. */
+/**
+ * Lightweight validity check (F6). Resolves true (valid) or false (401/403 — key rejected).
+ * Any other failure (network, model unavailable, overload) rejects with an AiError so the UI
+ * does not mislabel it as an invalid key.
+ */
 export async function testApiKey(apiKey: string, client?: AiClient): Promise<boolean> {
   const c = client ?? createAnthropicClient(apiKey);
   try {
     await c.complete({ system: 'Reply with OK.', user: 'ping', maxTokens: 1 });
     return true;
   } catch (e) {
-    const kind = classifyAiError(e);
-    if (kind === 'network') throw toAiError(e);
-    return false;
+    const status = (e as { status?: number })?.status;
+    if (classifyAiError(e) === 'invalid_key' || status === 403) return false;
+    throw toAiError(e);
   }
 }

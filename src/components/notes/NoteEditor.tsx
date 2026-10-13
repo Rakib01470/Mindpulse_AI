@@ -166,6 +166,7 @@ export function NoteEditor({ noteId: initialId, initialTopic, registerFlush, onD
         <TextInput
           mode="flat"
           placeholder="Title"
+          accessibilityLabel="Note title"
           value={title}
           onChangeText={(t) => {
             setTitle(t);
@@ -178,6 +179,7 @@ export function NoteEditor({ noteId: initialId, initialTopic, registerFlush, onD
         <TextInput
           mode="outlined"
           label="Topic"
+          accessibilityLabel="Note topic"
           value={topic}
           onChangeText={(t) => {
             setTopic(t);
@@ -203,6 +205,7 @@ export function NoteEditor({ noteId: initialId, initialTopic, registerFlush, onD
         <TextInput
           mode="flat"
           placeholder="Write or dictate your note…"
+          accessibilityLabel="Note text"
           value={content}
           onChangeText={(t) => {
             setContent(t);

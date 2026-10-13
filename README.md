@@ -107,13 +107,16 @@ The model is set in `src/utils/constants.ts` (`AI_MODEL`, default `claude-haiku-
 ## Testing
 
 ```bash
-npx tsc --noEmit     # strict type-check
-npx eslint .         # lint
-npx jest             # 71 tests: formatting, AI parsing, encryption, every DAO, timer, backup round-trip
-ANTHROPIC_API_KEY=sk-ant-... npx jest tests/live.ai.test.ts   # optional: real-API checks for the phase checkpoints
+npm run typecheck    # strict TypeScript
+npm run lint         # ESLint (eslint-config-expo)
+npm test             # 71 unit + DAO tests on a real SQLite engine
+npm run test:ui      # renders the real app and runs the Section 9 manual test script end to end
+ANTHROPIC_API_KEY=sk-ant-... npm run test:live   # optional: phase checkpoints against the real Anthropic API
 ```
 
-The DAO tests run the app's real SQL on Node's built-in SQLite through the same interface expo-sqlite implements, so schema constraints, foreign keys and transactions are exercised for real.
+- **DAO tests** run the app's real SQL on Node's built-in SQLite through the same interface expo-sqlite implements, so CHECK constraints, foreign keys and transactions are exercised for real.
+- **UI tests** (`tests-ui/`) render `App` with the React Native test renderer (jest-expo, Android preset), backed by real SQLite, in Expo Go mode (dictation typed) with a fake Anthropic endpoint. They walk the whole manual script: API key save/test, AI-parsed task, offline fallback, slider to 100%, project timer surviving tab switches, notes grammar fix, dashboard contents, export → delete → import, corrupted-file import, custom category deletion.
+- What still needs a phone: the microphone, real speech recognition, Android share sheet/file picker UI, and visual polish.
 
 ## Known limitations
 

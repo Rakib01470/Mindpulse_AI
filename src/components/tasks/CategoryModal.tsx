@@ -37,6 +37,7 @@ export function CategoryModal({ visible, onDismiss }: { visible: boolean; onDism
           <TextInput
             mode="outlined"
             label="Name (e.g. Academic Work)"
+            accessibilityLabel="Category name"
             value={name}
             onChangeText={(t) => {
               setName(t);

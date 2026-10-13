@@ -51,11 +51,12 @@ export function ProjectFormModal({ visible, onDismiss, project }: { visible: boo
           <Text variant="titleLarge" style={styles.title}>
             {project ? 'Edit Project' : 'New Project'}
           </Text>
-          <TextInput mode="outlined" label="Title (e.g. 3D Asset Dev)" value={title} onChangeText={setTitle} maxLength={LIMITS.projectTitle} />
-          <TextInput mode="outlined" label="Description" value={description} onChangeText={setDescription} multiline style={styles.gap} />
+          <TextInput mode="outlined" label="Title (e.g. 3D Asset Dev)" accessibilityLabel="Project title" value={title} onChangeText={setTitle} maxLength={LIMITS.projectTitle} />
+          <TextInput mode="outlined" label="Description" accessibilityLabel="Project description" value={description} onChangeText={setDescription} multiline style={styles.gap} />
           <TextInput
             mode="outlined"
             label="Target hours"
+            accessibilityLabel="Target hours"
             value={target}
             onChangeText={setTarget}
             keyboardType="decimal-pad"

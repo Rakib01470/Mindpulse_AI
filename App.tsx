@@ -7,6 +7,8 @@ import { paperTheme, navTheme } from './src/utils/theme';
 import { DatabaseProvider } from './src/context/DatabaseContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { TasksProvider } from './src/context/TasksContext';
+import { ProjectsProvider } from './src/context/ProjectsContext';
+import { StopTimerModal } from './src/components/projects/StopTimerModal';
 
 export default function App() {
   return (
@@ -14,10 +16,13 @@ export default function App() {
       <PaperProvider theme={paperTheme}>
         <DatabaseProvider>
           <TasksProvider>
-            <NavigationContainer theme={navTheme}>
-              <AppNavigator />
-              <StatusBar style="light" />
-            </NavigationContainer>
+            <ProjectsProvider>
+              <NavigationContainer theme={navTheme}>
+                <AppNavigator />
+                <StopTimerModal />
+                <StatusBar style="light" />
+              </NavigationContainer>
+            </ProjectsProvider>
           </TasksProvider>
         </DatabaseProvider>
       </PaperProvider>

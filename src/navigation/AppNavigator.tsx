@@ -1,5 +1,6 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View } from 'react-native';
+import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { LayoutDashboard, ListChecks, Timer, NotebookPen, Settings as SettingsIcon } from 'lucide-react-native';
 import type { RootStackParamList, TabParamList } from './types';
@@ -11,6 +12,8 @@ import { NotesScreen } from '../screens/NotesScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { VoiceCaptureScreen } from '../screens/VoiceCaptureScreen';
 import { TaskDetailScreen } from '../screens/TaskDetailScreen';
+import { ProjectDetailScreen } from '../screens/ProjectDetailScreen';
+import { TimerWidget } from '../components/projects/TimerWidget';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -20,6 +23,13 @@ const c = ThemeTokens.colors;
 function MainTabs() {
   return (
     <Tab.Navigator
+      // The live stopwatch sits directly above the tab bar so it stays visible on every tab (F3).
+      tabBar={(props) => (
+        <View>
+          <TimerWidget />
+          <BottomTabBar {...props} />
+        </View>
+      )}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: c.accent,
@@ -54,6 +64,7 @@ export function AppNavigator() {
         options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
       />
       <Stack.Screen name="TaskDetail" component={TaskDetailScreen} options={{ title: 'Task' }} />
+      <Stack.Screen name="ProjectDetail" component={ProjectDetailScreen} options={{ title: 'Project' }} />
     </Stack.Navigator>
   );
 }

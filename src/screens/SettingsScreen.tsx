@@ -1,13 +1,22 @@
 import React from 'react';
+import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenHeader } from '../components/common/ScreenHeader';
-import { EmptyState } from '../components/common/EmptyState';
+import { ApiKeySection } from '../components/settings/ApiKeySection';
+import { ThemeTokens } from '../utils/theme';
 
 export function SettingsScreen() {
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={styles.flex} edges={['top']}>
       <ScreenHeader title="Settings" />
-      <EmptyState message="Settings — coming in a later phase." />
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <ApiKeySection />
+      </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  content: { padding: ThemeTokens.spacing.md, gap: ThemeTokens.spacing.md, paddingBottom: 120 },
+});

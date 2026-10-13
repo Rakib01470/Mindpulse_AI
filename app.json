@@ -1,35 +1,46 @@
 {
   "expo": {
-    "name": "mindpulse-app",
-    "slug": "mindpulse-app",
+    "name": "MindPulse AI",
+    "slug": "mindpulse-ai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0F172A",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0F172A"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false
     },
     "android": {
+      "package": "com.mindpulse.ai",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+        "backgroundColor": "#0F172A"
+      },
+      "permissions": ["android.permission.RECORD_AUDIO"],
+      "blockedPermissions": ["android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE"],
+      "softwareKeyboardLayoutMode": "resize"
     },
     "plugins": [
       "expo-sqlite",
       "expo-secure-store",
       "@react-native-community/datetimepicker",
       "expo-asset",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "MindPulse AI uses the microphone to capture tasks and notes by voice.",
+          "speechRecognitionPermission": "MindPulse AI uses speech recognition to turn your voice into tasks and notes.",
+          "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox", "com.google.android.as"]
+        }
+      ]
     ]
   }
 }

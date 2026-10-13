@@ -6,16 +6,19 @@ import { PaperProvider } from 'react-native-paper';
 import { paperTheme, navTheme } from './src/utils/theme';
 import { DatabaseProvider } from './src/context/DatabaseContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
+import { TasksProvider } from './src/context/TasksContext';
 
 export default function App() {
   return (
     <SafeAreaProvider>
       <PaperProvider theme={paperTheme}>
         <DatabaseProvider>
-          <NavigationContainer theme={navTheme}>
-            <AppNavigator />
-            <StatusBar style="light" />
-          </NavigationContainer>
+          <TasksProvider>
+            <NavigationContainer theme={navTheme}>
+              <AppNavigator />
+              <StatusBar style="light" />
+            </NavigationContainer>
+          </TasksProvider>
         </DatabaseProvider>
       </PaperProvider>
     </SafeAreaProvider>

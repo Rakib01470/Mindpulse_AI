@@ -58,6 +58,8 @@ mindpulse-app/
 
 ## Setup and running
 
+> **Building the APK on Windows?** Follow **[BUILD_GUIDE.md](BUILD_GUIDE.md)**, a step-by-step guide using WSL and EAS Build.
+
 Prerequisites: Node.js 18+ (20+ recommended), an Android phone, and an [Anthropic API key](https://console.anthropic.com/).
 
 ```bash

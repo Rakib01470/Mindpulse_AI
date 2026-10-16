@@ -4,7 +4,7 @@
  * throw at startup, so the app degrades to typed input instead (DECISIONS.md D-02).
  */
 import { Platform } from 'react-native';
-import { SPEECH_SILENCE_TIMEOUT_MS } from '../utils/constants';
+import { DEFAULT_VOICE_LANGUAGE, SPEECH_SILENCE_TIMEOUT_MS } from '../utils/constants';
 
 type SpeechPkg = typeof import('expo-speech-recognition');
 
@@ -158,7 +158,7 @@ export function startDictation(
 
   try {
     m.ExpoSpeechRecognitionModule.start({
-      lang: opts.lang ?? 'en-US',
+      lang: opts.lang ?? DEFAULT_VOICE_LANGUAGE,
       interimResults: true,
       continuous: opts.continuous ?? false,
       addsPunctuation: true,

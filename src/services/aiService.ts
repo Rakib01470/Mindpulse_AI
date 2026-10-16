@@ -175,10 +175,13 @@ export function extractJson(text: string): unknown {
   }
 }
 
+/** Bengali digits (০-৯) → ASCII, in case the model echoes the speaker's numerals in a date or time. */
+const asciiDigits = (s: string) => s.replace(/[০-৯]/g, (d) => String(d.charCodeAt(0) - 0x09e6));
+
 /** "3:00" → "03:00", "15:00" stays; anything else → null. */
 const normalizeTime = (v: unknown): string | null => {
   if (typeof v !== 'string') return null;
-  const m = v.trim().match(/^(\d{1,2}):(\d{2})$/);
+  const m = asciiDigits(v.trim()).match(/^(\d{1,2}):(\d{2})$/);
   if (!m) return null;
   const hhmm = `${m[1].padStart(2, '0')}:${m[2]}`;
   return isHHmm(hhmm) ? hhmm : null;
@@ -195,7 +198,8 @@ export function normalizeParsedTask(raw: unknown, transcript: string): ParsedTas
   const title = capitalise(str(o.title)).slice(0, LIMITS.taskTitle) || fallbackTitle;
   const pRaw = str(o.priority).toLowerCase();
   const priority = (PRIORITIES.find((p) => p.toLowerCase() === pRaw) ?? 'Medium') as Priority;
-  const due_date = isIsoDate(str(o.due_date)) ? str(o.due_date) : null;
+  const dateRaw = asciiDigits(str(o.due_date));
+  const due_date = isIsoDate(dateRaw) ? dateRaw : null;
   const due_time = normalizeTime(o.due_time);
   const category_name = str(o.category_name).slice(0, LIMITS.categoryName) || 'Office Work';
   const summary = str(o.summary) || null;

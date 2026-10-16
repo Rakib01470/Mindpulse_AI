@@ -39,7 +39,16 @@ export const LIMITS = {
 export const SETTINGS_KEYS = {
   apiKeyCipher: 'anthropic_api_key',
   activeTimer: 'active_timer',
+  voiceLanguage: 'voice_language',
 } as const;
+
+/** Dictation languages offered in Settings (BCP-47 tags passed to the Android recognizer). */
+export const VOICE_LANGUAGES = [
+  { tag: 'en-US', label: 'English' },
+  { tag: 'bn-BD', label: 'বাংলা (Bengali)' },
+] as const;
+export type VoiceLanguage = (typeof VOICE_LANGUAGES)[number]['tag'];
+export const DEFAULT_VOICE_LANGUAGE: VoiceLanguage = 'en-US';
 
 export const NOTE_AUTOSAVE_MS = 5000;
 export const SPEECH_SILENCE_TIMEOUT_MS = 5000;
@@ -79,6 +88,14 @@ export const TASK_PARSE_SYSTEM_PROMPT = (opts: {
 Context:
 - Today is ${opts.weekday}, ${opts.today} (YYYY-MM-DD). Current local time is ${opts.nowTime} (24h). Timezone: Asia/Dhaka. The week starts on Sunday.
 - Existing task categories: ${opts.categories.map((c) => `"${c}"`).join(', ')}.
+- The dictation may be in English, Bengali (বাংলা) or a mix of both.
+
+Language rules:
+- Write "title" and "summary" in the language the task was spoken in. Do NOT translate a Bengali task into English; keep Bengali script and keep English words the speaker used as they are.
+- "category_name" is always an existing category name exactly as listed above (Bengali "অফিস"/"কাজ"/"ব্যাংক" -> "Office Work"; "ব্যক্তিগত"/"বাসা"/"বাড়ি" -> "Personal Work").
+- "priority", "due_date" and "due_time" always use the English values and ASCII digits 0-9, never Bengali digits (০-৯).
+- Bengali dates and times: "আজ" = today, "আগামীকাল"/"কাল" = tomorrow, "পরশু" = the day after tomorrow, "আগামী সপ্তাহ" = next week; "সকাল" = morning (AM), "দুপুর" = midday (12-15), "বিকাল"/"বিকেল" = afternoon (PM, "বিকেল ৩টা" -> "15:00"), "সন্ধ্যা" = evening (PM), "রাত" = night (PM, "রাত ১০টা" -> "22:00"); "টা"/"টায়" after a number means o'clock.
+- Bengali "জরুরি"/"খুব গুরুত্বপূর্ণ"/"এখনই" -> "High"; "কম গুরুত্বপূর্ণ" -> "Low".
 
 Return ONLY a JSON object, no prose and no code fences, with exactly these keys:
 {
@@ -91,7 +108,10 @@ Return ONLY a JSON object, no prose and no code fences, with exactly these keys:
 }
 
 Example input: "High priority office task submit quarterly tax report by tomorrow 3 PM"
-Example output: {"title":"Submit quarterly tax report","category_name":"Office Work","priority":"High","due_date":"<tomorrow's date>","due_time":"15:00","summary":"Submit the quarterly tax report by 3 PM tomorrow."}`;
+Example output: {"title":"Submit quarterly tax report","category_name":"Office Work","priority":"High","due_date":"<tomorrow's date>","due_time":"15:00","summary":"Submit the quarterly tax report by 3 PM tomorrow."}
+
+Example input: "জরুরি অফিসের কাজ আগামীকাল বিকেল ৩টার মধ্যে ত্রৈমাসিক ট্যাক্স রিপোর্ট জমা দিতে হবে"
+Example output: {"title":"ত্রৈমাসিক ট্যাক্স রিপোর্ট জমা দেওয়া","category_name":"Office Work","priority":"High","due_date":"<tomorrow's date>","due_time":"15:00","summary":"আগামীকাল বিকেল ৩টার মধ্যে ত্রৈমাসিক ট্যাক্স রিপোর্ট জমা দিতে হবে।"}`;
 
 export const GRAMMAR_SYSTEM_PROMPT =
   'Correct spelling, grammar, and format into clean readable paragraphs/bullet points while preserving exact meaning. ' +

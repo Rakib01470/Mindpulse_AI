@@ -6,6 +6,7 @@ import { AlertTriangle, CheckCircle2, Mic, Square, X } from 'lucide-react-native
 import { useDatabase } from '../../context/DatabaseContext';
 import { emptyDraft, useTasks, type TaskDraft } from '../../context/TasksContext';
 import { loadApiKey } from '../../services/apiKeyStore';
+import { loadVoiceLanguage } from '../../services/voiceLanguageStore';
 import { AiError, fallbackTask, parseTaskFromTranscript, type ParsedTask } from '../../services/aiService';
 import { ensureMicPermission, isSpeechAvailable, startDictation, type DictationSession } from '../../services/speechService';
 import { ValidationError } from '../../database/types';
@@ -128,6 +129,8 @@ export function VoiceOverlay({ onClose, onOpenTask }: Props) {
       setPhase('idle');
       return;
     }
+    const lang = await loadVoiceLanguage(db).catch(() => undefined);
+    if (!mounted.current) return;
     setBanner(null);
     updateTranscript('');
     processOnEnd.current = true;
@@ -160,8 +163,8 @@ export function VoiceOverlay({ onClose, onOpenTask }: Props) {
           setPhase('idle');
         }
       },
-    });
-  }, [speechAvailable, process]);
+    }, { lang });
+  }, [speechAvailable, process, db]);
 
   useEffect(() => {
     mounted.current = true;

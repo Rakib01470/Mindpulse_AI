@@ -5,6 +5,7 @@ import { ScreenHeader } from '../components/common/ScreenHeader';
 import { ApiKeySection } from '../components/settings/ApiKeySection';
 import { CategoriesSection } from '../components/settings/CategoriesSection';
 import { BackupSection } from '../components/settings/BackupSection';
+import { VoiceLanguageSection } from '../components/settings/VoiceLanguageSection';
 import { Text } from 'react-native-paper';
 import Constants from 'expo-constants';
 import { ThemeTokens } from '../utils/theme';
@@ -15,6 +16,7 @@ export function SettingsScreen() {
       <ScreenHeader title="Settings" />
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <ApiKeySection />
+        <VoiceLanguageSection />
         <CategoriesSection />
         <BackupSection />
         <Text variant="labelSmall" style={styles.version}>

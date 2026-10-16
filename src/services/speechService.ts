@@ -3,6 +3,7 @@
  * The native module is loaded lazily: in Expo Go it is absent and importing it would
  * throw at startup, so the app degrades to typed input instead (DECISIONS.md D-02).
  */
+import { Platform } from 'react-native';
 import { SPEECH_SILENCE_TIMEOUT_MS } from '../utils/constants';
 
 type SpeechPkg = typeof import('expo-speech-recognition');
@@ -40,6 +41,20 @@ export async function ensureMicPermission(): Promise<boolean> {
   return res.granted;
 }
 
+// Google's network-capable recognizers (Android 13+, then older Android). Phones whose default
+// is another vendor's service (e.g. Samsung) often return "no speech" to third-party apps.
+const PREFERRED_SERVICES = ['com.google.android.tts', 'com.google.android.googlequicksearchbox'];
+
+function pickRecognitionService(m: SpeechPkg): string | undefined {
+  if (Platform.OS !== 'android') return undefined;
+  try {
+    const available = m.ExpoSpeechRecognitionModule.getSpeechRecognitionServices();
+    return PREFERRED_SERVICES.find((p) => available.includes(p));
+  } catch {
+    return undefined;
+  }
+}
+
 export type SpeechErrorKind = 'no-speech' | 'permission' | 'network' | 'unavailable' | 'other';
 
 export interface DictationHandlers {
@@ -69,9 +84,11 @@ export function startDictation(
   }
 
   let finalText = '';
+  let partialText = '';
   let heardSomething = false;
   let ended = false;
   const subs: { remove: () => void }[] = [];
+  let silenceTimer: ReturnType<typeof setTimeout> | undefined;
 
   const cleanup = () => {
     clearTimeout(silenceTimer);
@@ -79,42 +96,59 @@ export function startDictation(
     subs.length = 0;
   };
 
-  // Section 10: give up after 5 s with no speech at all.
-  const silenceTimer = setTimeout(() => {
-    if (!heardSomething && !ended) {
-      handlers.onError('no-speech', 'No speech detected');
-      m.ExpoSpeechRecognitionModule.abort();
-    }
-  }, SPEECH_SILENCE_TIMEOUT_MS);
+  // Call addListener on the module itself. The package's addSpeechRecognitionListener export is a
+  // detached copy of it; under the New Architecture it loses `this`, and no event ever arrives.
+  const speech = m.ExpoSpeechRecognitionModule;
+  const service = pickRecognitionService(m);
+  const via = service ?? 'default recognizer';
 
+  // Section 10: give up after 5 s with no speech at all. Counted from the "start" event,
+  // not from start(): the recognizer can take a second or two to begin listening.
   subs.push(
-    m.addSpeechRecognitionListener('speechstart', () => {
+    speech.addListener('start', () => {
+      silenceTimer = setTimeout(() => {
+        if (!heardSomething && !ended) {
+          handlers.onError('no-speech', `no sound heard, ${via}`);
+          m.ExpoSpeechRecognitionModule.abort();
+        }
+      }, SPEECH_SILENCE_TIMEOUT_MS);
+    }),
+    speech.addListener('speechstart', () => {
       heardSomething = true;
     }),
-    m.addSpeechRecognitionListener('result', (ev) => {
+    speech.addListener('result', (ev) => {
       const text = ev.results[0]?.transcript?.trim() ?? '';
       if (text) heardSomething = true;
       if (ev.isFinal) {
         finalText = [finalText, text].filter(Boolean).join(' ');
+        partialText = '';
         handlers.onTranscript(finalText, true);
       } else {
+        partialText = text;
         handlers.onTranscript([finalText, text].filter(Boolean).join(' '), false);
       }
     }),
-    m.addSpeechRecognitionListener('volumechange', (ev) => handlers.onVolume?.(ev.value)),
-    m.addSpeechRecognitionListener('nomatch', () => {
-      if (!finalText) handlers.onError('no-speech', 'No speech recognised');
+    speech.addListener('volumechange', (ev) => {
+      // Not every recognizer sends "speechstart"; a clear input level means the mic hears the user.
+      if (ev.value > 1) heardSomething = true;
+      handlers.onVolume?.(ev.value);
     }),
-    m.addSpeechRecognitionListener('error', (ev) => {
+    speech.addListener('error', (ev) => {
       const code = ev.error;
       if (code === 'aborted') return;
       if (code === 'no-speech' || code === 'speech-timeout') {
-        if (!finalText) handlers.onError('no-speech', ev.message);
+        // Google's recognizer can stream partial words and then return an empty final result
+        // (e.g. speech in another language). Keep what it showed instead of discarding it.
+        if (partialText) {
+          finalText = [finalText, partialText].filter(Boolean).join(' ');
+          partialText = '';
+          handlers.onTranscript(finalText, true);
+        } else if (!finalText) handlers.onError('no-speech', `${code}: ${ev.message}, ${via}`);
       } else if (code === 'not-allowed') handlers.onError('permission', ev.message);
       else if (code === 'network') handlers.onError('network', ev.message);
-      else handlers.onError('other', `${code}: ${ev.message}`);
+      else handlers.onError('other', `${code}: ${ev.message}, ${via}`);
     }),
-    m.addSpeechRecognitionListener('end', () => {
+    speech.addListener('end', () => {
       if (ended) return;
       ended = true;
       cleanup();
@@ -128,11 +162,12 @@ export function startDictation(
       interimResults: true,
       continuous: opts.continuous ?? false,
       addsPunctuation: true,
+      androidRecognitionServicePackage: service,
       volumeChangeEventOptions: { enabled: true, intervalMillis: 120 },
-      androidIntentOptions: {
-        EXTRA_PREFER_OFFLINE: true, // use the on-device model when it is installed (Section 2 #3)
-        EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS: 2000,
-      },
+      // No androidIntentOptions (DECISIONS.md D-12, D-13). EXTRA_PREFER_OFFLINE makes Google's
+      // recognizer answer "no match" without the offline pack, and on Android 16 it applies
+      // EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS before speech starts too, closing the
+      // mic 2 s after it opens. Its default end-of-speech pause is used instead.
     });
   } catch (e) {
     cleanup();

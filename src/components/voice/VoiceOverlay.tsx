@@ -135,15 +135,19 @@ export function VoiceOverlay({ onClose, onOpenTask }: Props) {
     session.current = startDictation({
       onTranscript: (t) => updateTranscript(t),
       onVolume: setVolume,
-      onError: (kind) => {
+      onError: (kind, message) => {
         if (kind === 'no-speech') {
           processOnEnd.current = false;
-          setBanner({ text: MESSAGES.noSpeech, tone: 'warn' });
+          // The detail (error code and recognizer) says why, e.g. a missing speech service.
+          setBanner({ text: `${MESSAGES.noSpeech}
+(${message})`, tone: 'warn' });
         } else if (kind === 'permission') {
           processOnEnd.current = false;
           setBanner({ text: MESSAGES.audioPermission, tone: 'error' });
         } else if (kind === 'network') {
           setBanner({ text: 'Speech service needs a connection or an offline language pack. You can type the task instead.', tone: 'warn' });
+        } else {
+          setBanner({ text: `Speech recognition failed (${message}). You can type the task instead.`, tone: 'warn' });
         }
       },
       onEnd: () => {

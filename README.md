@@ -108,6 +108,8 @@ The model is set in `src/utils/constants.ts` (`AI_MODEL`, default `claude-haiku-
 
 ## Testing
 
+The test suites need **Node 22.5+** because they use Node's built-in SQLite. Building and running the app only needs Node 20+.
+
 ```bash
 npm run typecheck    # strict TypeScript
 npm run lint         # ESLint (eslint-config-expo)

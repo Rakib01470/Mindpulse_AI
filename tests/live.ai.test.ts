@@ -2,6 +2,7 @@
  * Live checks against the real Anthropic API — skipped unless ANTHROPIC_API_KEY is set.
  *   ANTHROPIC_API_KEY=sk-ant-... npx jest tests/live.ai.test.ts
  * Covers the Phase 2 and Phase 5 verification checkpoints end-to-end (minus the microphone).
+ *   GEMINI_API_KEY=AIza... npx jest tests/live.ai.test.ts   (Gemini variant)
  */
 import { addDays } from 'date-fns';
 import { createAnthropicClient, fixGrammar, parseTaskFromTranscript, testApiKey } from '../src/services/aiService';
@@ -54,5 +55,29 @@ live('LIVE Anthropic API', () => {
     const out = await fixGrammar('i thinked about new game mechanic for jumping high', { apiKey: key! });
     console.log('Grammar:', out);
     expect(out).toMatch(/^I thought about a new game mechanic for jumping high\.?$/);
+  });
+});
+
+const gemini = process.env.GEMINI_API_KEY;
+(gemini ? describe : describe.skip)('LIVE Google Gemini API', () => {
+  const now = new Date(2026, 9, 13, 10, 0);
+  it('accepts the key', async () => {
+    await expect(testApiKey(gemini!)).resolves.toBe(true);
+  });
+  it('Phase 2 checkpoint via Gemini', async () => {
+    const t = await parseTaskFromTranscript('High priority office task review branch audit report by 4 PM', {
+      apiKey: gemini!,
+      categories: ['Office Work', 'Personal Work'],
+      now,
+    });
+    console.log('Gemini parsed JSON:', JSON.stringify(t, null, 2));
+    expect(t.category_name).toBe('Office Work');
+    expect(t.priority).toBe('High');
+    expect(t.due_time).toBe('16:00');
+  });
+  it('grammar fix via Gemini', async () => {
+    const out = await fixGrammar('i thinked about new game mechanic for jumping high', { apiKey: gemini! });
+    console.log('Gemini grammar:', out);
+    expect(out.toLowerCase()).toContain('i thought about');
   });
 });

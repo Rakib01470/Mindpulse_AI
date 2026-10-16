@@ -36,7 +36,7 @@ it('runs the manual test script end to end', async () => {
   expect(screen.getByText('Personal Work')).toBeTruthy();
 
   // 2. API key setup → Test → "Valid Key".
-  fireEvent.changeText(screen.getByLabelText('Anthropic API key'), 'sk-ant-api03-TESTKEY-0000');
+  fireEvent.changeText(screen.getByLabelText('AI API key'), 'sk-ant-api03-TESTKEY-0000');
   await act(async () => fireEvent.press(screen.getByText('Save Key')));
   await waitFor(() => screen.getByText(/Saved \(encrypted on this device\)/));
   queueAnthropic({ text: 'OK' });

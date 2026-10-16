@@ -4,8 +4,8 @@ import { Button, HelperText, Text, TextInput, Surface } from 'react-native-paper
 import { CheckCircle2, XCircle, KeyRound } from 'lucide-react-native';
 import { useDatabase } from '../../context/DatabaseContext';
 import { loadApiKey, saveApiKey, clearApiKey, maskApiKey } from '../../services/apiKeyStore';
-import { AiError, testApiKey } from '../../services/aiService';
-import { AI_MODEL, MESSAGES } from '../../utils/constants';
+import { AiError, detectProvider, providerLabel, testApiKey } from '../../services/aiService';
+import { MESSAGES } from '../../utils/constants';
 import { ThemeTokens } from '../../utils/theme';
 
 type TestState =
@@ -31,8 +31,8 @@ export function ApiKeySection() {
 
   const onSave = async () => {
     const trimmed = input.trim();
-    if (!trimmed.startsWith('sk-ant-')) {
-      setError('Anthropic keys start with "sk-ant-".');
+    if (!detectProvider(trimmed)) {
+      setError('Paste an Anthropic key (starts with "sk-ant-") or a Gemini key (starts with "AIza").');
       return;
     }
     setBusy(true);
@@ -60,9 +60,13 @@ export function ApiKeySection() {
       setTest({ kind: (await testApiKey(key)) ? 'valid' : 'invalid' });
     } catch (e) {
       if (e instanceof AiError && e.kind === 'network') setTest({ kind: 'offline' });
+      else if (e instanceof AiError && e.kind === 'rate_limited') setTest({ kind: 'error', message: MESSAGES.rateLimited });
       else setTest({ kind: 'error', message: e instanceof Error ? e.message : String(e) });
     }
   };
+
+  const typed = input.trim() ? detectProvider(input) : null;
+  const activeProvider = typed ?? (saved ? detectProvider(saved) : null);
 
   const onClear = async () => {
     await clearApiKey(db);
@@ -75,7 +79,7 @@ export function ApiKeySection() {
       <View style={styles.titleRow}>
         <KeyRound color={ThemeTokens.colors.accent} size={20} />
         <Text variant="titleMedium" style={styles.title}>
-          Anthropic API Key
+          AI API Key
         </Text>
       </View>
       <Text variant="bodySmall" style={styles.muted}>
@@ -83,8 +87,8 @@ export function ApiKeySection() {
       </Text>
       <TextInput
         mode="outlined"
-        label={saved ? 'Replace key' : 'sk-ant-...'}
-        accessibilityLabel="Anthropic API key"
+        label={saved ? 'Replace key' : 'sk-ant-... or AIza...'}
+        accessibilityLabel="AI API key"
         value={input}
         onChangeText={(t) => {
           setInput(t);
@@ -117,7 +121,7 @@ export function ApiKeySection() {
           <Text style={{ color: ThemeTokens.colors.priorityHigh }}>{MESSAGES.invalidKey}</Text>
         </View>
       ) : null}
-      {test.kind === 'offline' ? <HelperText type="error">Network unavailable — could not reach Anthropic.</HelperText> : null}
+      {test.kind === 'offline' ? <HelperText type="error">Network unavailable — could not reach the AI service.</HelperText> : null}
       {test.kind === 'error' ? <HelperText type="error">Could not verify the key: {test.message}</HelperText> : null}
       {saved ? (
         <Button mode="text" onPress={onClear} textColor={ThemeTokens.colors.priorityHigh} style={styles.clear}>
@@ -125,8 +129,13 @@ export function ApiKeySection() {
         </Button>
       ) : null}
       <Text variant="labelSmall" style={styles.muted}>
-        Model: {AI_MODEL}
+        {activeProvider ? `Using: ${providerLabel(activeProvider)}` : 'Anthropic (sk-ant-…) and Google Gemini (AIza…) keys are both supported.'}
       </Text>
+      {activeProvider === 'gemini' ? (
+        <Text variant="labelSmall" style={styles.warn}>
+          Gemini free tier: Google may use what you send to improve its products. Avoid putting confidential work or customer details into AI fixes.
+        </Text>
+      ) : null}
     </Surface>
   );
 }
@@ -136,6 +145,7 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   title: { color: ThemeTokens.colors.textPrimary, fontWeight: '600' },
   muted: { color: ThemeTokens.colors.textMuted },
+  warn: { color: ThemeTokens.colors.priorityMedium },
   input: { backgroundColor: ThemeTokens.colors.surface },
   buttons: { flexDirection: 'row', gap: ThemeTokens.spacing.sm, flexWrap: 'wrap' },
   btn: { minHeight: 48, justifyContent: 'center', flexGrow: 1 },

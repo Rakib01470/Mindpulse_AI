@@ -11,7 +11,7 @@ A local-first Android productivity app: capture tasks by voice and let Claude so
 | **Project hours (F3)** | Projects with target hours and a progress bar ("14.5 / 50 hrs (29%)"). One live stopwatch at a time, sticky above the tab bar on every tab, survives app restarts. Session notes, manual time entry, session log. |
 | **Notes + AI grammar (F4)** | Notes grouped by topic, search, 5-second auto-save, dictation (dev build), **Fix Grammar & Format** with a word-level before/after diff and Accept / Reject. |
 | **Dashboard (F5)** | Today's date, voice button, Urgent Focus (top 3 high-priority or overdue), project progress with Resume Timer, quick stats (completed today, hours this week from Sunday), recent notes. |
-| **Settings & backup (F6)** | Anthropic API key stored encrypted, Test API Key, category management, JSON export via the Android share sheet and import with Overwrite / Cancel. |
+| **Settings & backup (F6)** | Anthropic **or Google Gemini** API key (auto-detected from the key) stored encrypted, Test API Key, category management, JSON export via the Android share sheet and import with Overwrite / Cancel. |
 
 Display formats follow Bangladesh conventions: dates `dd-mm-yyyy`, 12-hour time with AM/PM, lakh grouping (`12,34,567`), weeks start on Sunday.
 
@@ -96,7 +96,7 @@ Download the `.apk` from the link EAS prints and install it on the phone (allow 
 2. Tap the mic on the Dashboard and say a task.
 3. **Projects → New Project** ("3D Asset Dev", 50 hrs) → **Start Session**.
 
-The model is set in `src/utils/constants.ts` (`AI_MODEL`, default `claude-haiku-5-5`).
+Models are set in `src/utils/constants.ts`: `AI_MODEL` (Anthropic, default `claude-haiku-5-5`) and `GEMINI_MODEL` (Google, default `gemini-3.5-flash-lite`). Paste either kind of key; the app picks the provider from the key's prefix.
 
 ## Data: SQLite and backups
 

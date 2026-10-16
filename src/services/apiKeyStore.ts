@@ -18,7 +18,7 @@ async function getMasterKey(): Promise<Uint8Array> {
   return fresh;
 }
 
-/** Encrypts the Anthropic key and stores the ciphertext in the SQLite settings table. */
+/** Encrypts the AI API key (Anthropic or Gemini) and stores the ciphertext in the SQLite settings table. */
 export async function saveApiKey(db: DbLike, apiKey: string): Promise<void> {
   const trimmed = apiKey.trim();
   if (!trimmed) {
@@ -45,6 +45,6 @@ export async function clearApiKey(db: DbLike): Promise<void> {
   await deleteSetting(db, SETTINGS_KEYS.apiKeyCipher);
 }
 
-/** sk-ant-api03-abc…wxyz */
+/** sk-ant-api03-abc…wxyz / AIzaSyAbc…wxyz */
 export const maskApiKey = (key: string): string =>
   key.length <= 14 ? '••••' : `${key.slice(0, 10)}…${key.slice(-4)}`;

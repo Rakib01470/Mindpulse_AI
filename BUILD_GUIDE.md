@@ -90,7 +90,7 @@ cp ~/mindpulse-app/app.json /mnt/f/Projects/Mindpulse_AI/app.json
 
 ## 5. First run checklist
 
-1. **Settings → Anthropic API Key**: paste `sk-ant-...` → **Save Key** → **Test API Key**. You should see the green "Valid Key".
+1. **Settings → AI API Key**: paste an Anthropic key (`sk-ant-...`) or a free Google Gemini key (`AIza...`, from https://aistudio.google.com/apikey) → **Save Key** → **Test API Key**. You should see the green "Valid Key".
 2. **Dashboard → mic button** → allow microphone → say *"High priority office task submit monthly branch compliance report by Friday 5 PM"* → check the card → **Save Task**.
 3. Turn on **Airplane mode** and dictate another task. You should see the "Network unavailable…" banner, and the task is saved with your words as the title.
 4. **Tasks**: drag a slider to 100%. The task should be struck through.
@@ -140,4 +140,19 @@ You only need to rebuild the development APK when you add a package with native 
 | Build fails on Expo's servers | Open the build page, expand the red step (usually *Run gradlew*), copy the last ~40 lines and send them to me. |
 | "Voice recognition is not available in this build" | You're in Expo Go. Install the APK from this guide instead. |
 | Mic works but nothing is recognised offline | Install the offline English pack: Android Settings → *Google* → *Voice* (or *Speech*) → *Offline speech recognition*. |
-| "Invalid Key" in Settings | Re-copy the key from console.anthropic.com, with no spaces. Check that the account has credit. |
+| "Invalid Key" in Settings | Re-copy the key with no spaces: Anthropic keys from console.anthropic.com (check the account has credit), Gemini keys from aistudio.google.com/apikey. |
+| "AI limit reached" | Gemini's free tier allows a limited number of requests per minute. Wait a minute and try again. |
+
+---
+
+## Check a Gemini key before building (optional)
+
+Run this in Ubuntu, replacing `YOUR_KEY` with your key. It sends one tiny request to the same model the app uses:
+
+```
+curl -s -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent" -H "x-goog-api-key: YOUR_KEY" -H "Content-Type: application/json" -d '{"contents":[{"role":"user","parts":[{"text":"Reply with OK"}]}]}'
+```
+
+- A reply containing `"text": "OK"` means the key and model both work.
+- `API key not valid` means the key is wrong.
+- `models/... is not found` means Google renamed the model. Change `GEMINI_MODEL` in `src/utils/constants.ts` to a current Flash-Lite model from https://ai.google.dev/gemini-api/docs/models.

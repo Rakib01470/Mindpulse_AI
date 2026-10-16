@@ -40,6 +40,9 @@ global.fetch = jest.fn(async (url: unknown, init?: { body?: string }) => {
   if ('status' in r) {
     return fakeResponse(r.status, { type: 'error', error: { type: r.status === 401 ? 'authentication_error' : 'api_error', message: 'x' } });
   }
+  if (String(url).includes('generativelanguage.googleapis.com')) {
+    return fakeResponse(200, { candidates: [{ content: { role: 'model', parts: [{ text: r.text }] }, finishReason: 'STOP' }] });
+  }
   return fakeResponse(200, {
     id: 'msg_1',
     type: 'message',

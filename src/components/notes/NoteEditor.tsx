@@ -97,7 +97,9 @@ export function NoteEditor({ noteId: initialId, initialTopic, registerFlush, onD
           ? MESSAGES.grammarOffline
           : kind === 'invalid_key'
             ? MESSAGES.apiKeyInvalid
-            : kind === 'missing_key'
+            : kind === 'rate_limited'
+              ? MESSAGES.rateLimited
+              : kind === 'missing_key'
               ? MESSAGES.apiKeyMissing
               : `AI request failed: ${(e as Error).message}`,
       );

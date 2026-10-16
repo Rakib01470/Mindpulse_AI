@@ -17,6 +17,12 @@ export const DEFAULT_CATEGORIES = [
  */
 export const AI_MODEL = 'claude-haiku-5-5';
 
+/**
+ * Google Gemini alternative (DECISIONS.md D-34). Flash-Lite: free tier, fastest 3.5 model,
+ * thinking defaults to "minimal" which suits short parsing/cleanup jobs.
+ */
+export const GEMINI_MODEL = 'gemini-3.5-flash-lite';
+
 export const PRIORITIES = ['High', 'Medium', 'Low'] as const;
 export const TASK_STATUSES = ['Pending', 'In Progress', 'Completed'] as const;
 export const PROJECT_STATUSES = ['Active', 'On Hold', 'Completed'] as const;
@@ -43,7 +49,8 @@ export const MESSAGES = {
   dbReady: 'Database initialized successfully',
   parsing: 'Parsing task with AI...',
   networkFallback: 'Network unavailable. Saved raw voice input to Task Title for manual editing.',
-  apiKeyMissing: 'Anthropic API Key missing. Please set your API Key in Settings to enable AI parsing.',
+  apiKeyMissing: 'AI API Key missing. Please set your Anthropic or Gemini API Key in Settings to enable AI parsing.',
+  rateLimited: 'AI limit reached (Gemini free tier allows a limited number of requests per minute). Please try again shortly.',
   apiKeyInvalid: 'Invalid API Key. Please verify your key in Settings and try again.',
   audioPermission:
     'Audio permission is required for voice input. Please enable microphone access in device Settings.',

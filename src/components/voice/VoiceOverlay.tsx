@@ -100,7 +100,12 @@ export function VoiceOverlay({ onClose, onOpenTask }: Props) {
           return;
         }
         setBanner({
-          text: kind === 'invalid_key' ? MESSAGES.apiKeyInvalid : 'AI could not parse this task. Please review the fields below.',
+          text:
+            kind === 'invalid_key'
+              ? MESSAGES.apiKeyInvalid
+              : kind === 'rate_limited'
+                ? MESSAGES.rateLimited
+                : 'AI could not parse this task. Please review the fields below.',
           tone: kind === 'invalid_key' ? 'error' : 'warn',
         });
         review(fallbackTask(text), false);
